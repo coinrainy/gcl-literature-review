@@ -78,6 +78,8 @@
 | Geom-GCN: Geometric Graph Convolutional Networks | 2020 | ICLR | https://arxiv.org/abs/2002.05287 | https://github.com/graphdml-uiuc-jlu/geom-gcn | Geom-GCN 是早期面向 disassortative/heterophilous 图的代表方法，适合纳入异配图实验与 split 讨论。 | Medium |
 | Large Scale Learning on Non-Homophilous Graphs: New Benchmarks and Strong Simple Methods | 2021 | NeurIPS | https://arxiv.org/abs/2110.14446 | https://github.com/CUAI/Non-Homophily-Large-Scale | LINKX 论文提供大规模异配图 benchmark，并指出 minibatching 在异配图上的退化，对可扩展异配 GCL 很关键。 | High |
 | Beyond Smoothing: Unsupervised Graph Representation Learning with Edge Heterophily Discriminating | 2023 | AAAI | https://arxiv.org/abs/2211.14065 | https://github.com/yixinliu233/GREET | GREET 面向无监督异配图表示学习，区分同配边与异配边并做双通道对比，是 heterophily graph SSL 的直接相关工作。 | High |
+| Graph Contrastive Learning under Heterophily via Graph Filters | 2024 | UAI | https://proceedings.mlr.press/v244/yang24a.html | https://github.com/BigML-CS-UCLA/HLCL | HLCL 用 low-pass / high-pass graph filters 构造 heterophily-aware contrastive views，是判断异配图 semantic-preserving augmentation 新颖性的关键强相关工作。 | High |
+| Enhancing Homophily in Heterogeneous Graph Contrastive Learning via Connection Strength and Multi-view Self-Expression | 2025 | SIGIR | https://arxiv.org/abs/2501.08538 | https://github.com/senllh/HGMS | HGMS 面向 heterogeneous graph 设计 connection-strength-guided edge dropping 和 multi-view self-expression，直接关联 heterophily-aware augmentation 与 false negative mitigation。 | High |
 
 ## 11. scalable GCL / large-scale graph SSL
 
@@ -93,6 +95,7 @@
 | GraphGPT: Graph Instruction Tuning for Large Language Models | 2024 | SIGIR | https://arxiv.org/abs/2310.13023 | https://github.com/HKUDS/GraphGPT | GraphGPT 将图结构知识与 LLM 指令调优结合，代表图基础模型从 GNN 预训练走向 LLM 对齐的方向。 | High |
 | Multi-modal Molecule Structure-text Model for Text-based Retrieval and Editing | 2023 | Nature Machine Intelligence | https://doi.org/10.1038/s42256-023-00759-6 | https://github.com/chao1224/MoleculeSTM | MoleculeSTM 用分子结构-文本对比预训练支撑检索和编辑，是 graph-text contrastive pretraining 的关键分子场景论文。 | High |
 | GraphCLIP: Enhancing Transferability in Graph Foundation Models for Text-Attributed Graphs | 2024 | arXiv | https://arxiv.org/abs/2410.10329 | https://github.com/ZhuYun97/GraphCLIP | GraphCLIP 面向 text-attributed graphs 做 language-graph pretraining，适合关注 GCL 与 graph foundation model 的交叉。 | Medium |
+| GAugLLM: Improving Graph Contrastive Learning for Text-Attributed Graphs with Large Language Models | 2024 | KDD | https://arxiv.org/abs/2406.11945 | https://github.com/NYUSHCS/GAugLLM | GAugLLM 用 LLM 做 text-attributed graph 的 feature/edge augmentation，是评估 graph-text conflict-aware GCL 新颖性时必须纳入的强 baseline。 | High |
 
 ## 13. recommendation graph contrastive learning
 
