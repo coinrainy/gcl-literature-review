@@ -2,24 +2,26 @@
 
 本文档基于 `outputs/gcl_literature_table.csv` 和 `outputs/method_taxonomy.md` 生成，面向后续方法型论文选题判断。每个 gap 都绑定文献表中的具体证据，并按“现有假设 -> 失败机制 -> 可能方法 -> 实验验证 -> 风险”组织。
 
-## 最推荐优先推进的 3 个 Gap
+## 最推荐优先推进的 4 个 Gap
 
 当前最新排序以底部“总结性排序”为准。短期主线应进入 **Gap 2 failure verification**，先证明 positive view failure 与 negative pair collision 是否在同一批场景中同时存在，再决定是否进入方法设计。
 
-1. **Gap 2: Reliability-aware False Negative and False Positive Correction**
+1. **Rank 1: Reliability-aware False Negative and False Positive Correction**
    - 当前最推荐主线。`GDCL`、`ProGCL`、`CGC`、`IFL-GCL`、`ROSEN`、`HGMS` 已经确认 false negative / false positive 是 GCL 核心问题，但它们多偏向 negative side、局部 positive 重构或特定图类型，仍缺少正负样本双侧、跨场景可校准的 pair reliability 证据链。
    - 下一步不是直接提出新方法，而是先做 failure verification：同时诊断 positive view 是否失效、batch / hard negatives 是否含有同类 collision、两类风险是否在异配图和低同配节点上共现。
    - 推荐 venue：ICML / NeurIPS / ICLR；若强调图挖掘应用和大规模实验，适合 KDD / WWW。
 
-2. **Gap 6: Mini-batch Friendly Scalable GCL with Controlled Negative Noise**
+2. **Rank 2: Mini-batch Friendly Scalable GCL with Controlled Negative Noise**
    - 排名第二，适合作为 Gap 2 的可扩展版本或备选路线。如果 failure verification 显示 negative collision 随 batch size / hard-negative mining 明显恶化，但 positive view failure 不稳定，则可转向 scalable mini-batch negative noise。
    - 推荐 venue：KDD / WWW / NeurIPS / TKDE。
 
-3. **Gap 1: Heterophily-aware Semantic-Preserving Augmentation**
+3. **Rank 3: Heterophily-aware Semantic-Preserving Augmentation**
    - 现在只能作为 view / positive reliability calibration 的异配场景版本。2024–2026 补强后，`HLCL` / `HGMS` / `PolyGCL` / `HeterGCL` / `M3P-GCL` / `ROSEN` 已覆盖普通 heterophily-aware augmentation / structure reconstruction 的多个版本，因此不能再把“普通异配增强”作为主 claim。
    - 推荐 venue：NeurIPS / ICLR / ICML；如果以大规模异配 benchmark 和系统评测为主，也适合 KDD / WWW。
 
-补充判断：**Gap 7: Graph-Text Conflict-aware Contrastive Pretraining** 仍是高潜力方向，但工程风险和 novelty 风险都更高。`GAugLLM`、`GCL-OT`、`GraphGPT`、`MoleculeSTM`、`GraphCLIP` 显示普通 LLM/TAG augmentation 和 graph-text alignment 已经拥挤，只有聚焦 structure-text conflict、cross-modal pair reliability 和 conflict-aware diagnostics 时才值得作为后续备选。
+4. **Rank 4: Graph-Text Conflict-aware Contrastive Pretraining**
+   - 仍是高潜力方向，但工程风险和 novelty 风险都更高。`GAugLLM`、`GCL-OT`、`GraphGPT`、`MoleculeSTM`、`GraphCLIP` 显示普通 LLM/TAG augmentation 和 graph-text alignment 已经拥挤，只有聚焦 structure-text conflict、cross-modal pair reliability 和 conflict-aware diagnostics 时才值得作为后续备选。
+   - 推荐 venue：NeurIPS / ICLR / ICML；若以 text-attributed graph benchmark 和检索/推荐应用为主，适合 KDD / WWW。
 
 结论：普通 heterophily-aware augmentation 与普通 LLM/TAG augmentation 不再建议作为主 claim；当前 repo 应优先围绕 Gap 2 做 failure verification。
 

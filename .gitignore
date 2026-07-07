@@ -7,6 +7,11 @@ Thumbs.db
 ~$*.xlsx
 *.inspect.ndjson
 
+# Local dataset caches and Python bytecode
+data/
+__pycache__/
+*.py[cod]
+
 # Keep PDF storage local by default; uploaded papers may be copyrighted.
 papers/pdf/*.pdf
 !papers/pdf/.gitkeep
