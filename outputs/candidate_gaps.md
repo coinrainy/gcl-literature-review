@@ -5,15 +5,15 @@
 ## 最推荐优先推进的 3 个 Gap
 
 1. **Gap 1: Heterophily-aware Semantic-Preserving Augmentation**
-   - 推荐原因：直接挑战 `GRACE` / `GraphCL` / `GCA` / `BGRL` 的核心假设，即随机扰动或中心性增强在异配图上仍语义保持。补强后 `HLCL` / `HGMS` 已覆盖 heterophily-aware augmentation 的一部分，因此该方向必须聚焦 view / positive reliability calibration 才仍有方法贡献空间。
+   - 推荐原因：直接挑战 `GRACE` / `GraphCL` / `GCA` / `BGRL` 的核心假设，即随机扰动或中心性增强在异配图上仍语义保持。2024–2026 补强后 `HLCL` / `HGMS` / `PolyGCL` / `HeterGCL` / `M3P-GCL` / `ROSEN` 已覆盖 heterophily-aware augmentation / structure reconstruction 的多个版本，因此该方向必须聚焦 view / positive reliability calibration 才仍有方法贡献空间。
    - 推荐 venue：NeurIPS / ICLR / ICML；如果以大规模异配 benchmark 和系统评测为主，也适合 KDD / WWW。
 
 2. **Gap 2: Reliability-aware False Negative and False Positive Correction**
-   - 推荐原因：`GDCL`、`ProGCL`、`CGC`、`HGMS` 已经确认 false negative 是 GCL 核心问题，但它们主要从聚类、hard negative 概率、反事实生成或异构图 self-expression 入手，仍缺少正负样本双侧、跨图类型可校准的 pair reliability 机制。
+   - 推荐原因：`GDCL`、`ProGCL`、`CGC`、`IFL-GCL`、`ROSEN`、`HGMS` 已经确认 false negative / false positive 是 GCL 核心问题，但它们分别偏向聚类、hard negative 概率、PU-style semantic positives、局部同配结构重构或异构图 self-expression，仍缺少正负样本双侧、跨图类型可校准的 pair reliability 机制。
    - 推荐 venue：ICML / NeurIPS / ICLR；若强调图挖掘应用和大规模实验，适合 KDD / WWW。
 
 3. **Gap 7: Graph-Text Conflict-aware Contrastive Pretraining**
-   - 推荐原因：`GAugLLM`、`GraphGPT`、`MoleculeSTM`、`GraphCLIP` 显示 graph-text/TAG pretraining 和 LLM augmentation 很活跃，但当前多数做法仍未系统处理文本相似但结构冲突、结构相似但文本冲突的样本。
+   - 推荐原因：`GAugLLM`、`GCL-OT`、`GraphGPT`、`MoleculeSTM`、`GraphCLIP` 显示 graph-text/TAG pretraining、LLM augmentation 和 heterophilic TAG alignment 已很活跃；该方向只有在聚焦 structure-text conflict、cross-modal pair reliability 和 conflict-aware soft labels 时仍有空间。
    - 推荐 venue：NeurIPS / ICLR / ICML；若以 text-attributed graph benchmark 和检索/推荐应用为主，适合 KDD / WWW。
 
 ## Gap 1: Heterophily-aware Semantic-Preserving Augmentation
@@ -31,7 +31,7 @@
   - Reliability-weighted contrastive loss：低可靠视图降低正对权重。
   - Optional masked reconstruction：用局部结构重构检测增强是否破坏关键邻域。
 - **Required Datasets**：Cora、Citeseer、PubMed、Amazon Computers、Coauthor CS 作为同配 sanity check；Chameleon、Squirrel、Actor、Cornell、Texas、Wisconsin；LINKX 论文中的 Penn94、pokec、arXiv-year、snap-patents、genius、twitch-gamers 用于大规模异配。
-- **Required Baselines**：DGI、MVGRL、GRACE、GCA、BGRL、CCA-SSG、GraphMAE、GraphMAE2、GREET、HLCL、HGMS、H2GCN、Geom-GCN、LINKX；若方法含 negative-free，还必须比较 AFGRL。
+- **Required Baselines**：DGI、MVGRL、GRACE、GCA、BGRL、CCA-SSG、GraphMAE、GraphMAE2、GREET、HLCL、HGMS、PolyGCL、HeterGCL、M3P-GCL、ROSEN、H2GCN、Geom-GCN、LINKX；若方法含 negative-free，还必须比较 AFGRL。若声称大规模异配/异构，还应在 H2GB 或其子集上验证。
 - **Key Experiments**：
   - 主结果：同配图、经典异配图、大规模异配图的 node classification。
   - 消融：去掉 edge-type estimator、去掉 reliability weighting、只用随机 edge dropping、只用 feature masking、只用双通道 encoder。
@@ -39,16 +39,16 @@
   - 可扩展性：在 Penn94 / pokec / snap-patents 上报告时间、显存和 batch 训练能力。
   - 机制分析：按边类型统计被保留/删除概率；按 homophily ratio 分组看提升来源；可视化 low-reliability view 是否对应性能下降。
 - **Key Risk**：边类型估计可能需要标签或伪标签，如果无监督估计不准，会导致方法复杂但收益不稳定。
-- **Novelty Risk**：高于原判断。`GREET` 已做 edge heterophily discriminating，`HLCL` 已用 low-pass / high-pass graph filters 构造 heterophily-aware contrastive views，`HGMS` 已在 heterogeneous graph 中用 connection-strength-guided heterogeneous edge dropping 增强同配性；因此不能再把“异配图上语义保持增强”本身作为主要 novelty。剩余空间必须收窄为“带不确定性的 view reliability / positive reliability calibration / 跨同构-异构-图文场景的统一增强可靠性”，而不是换一个 heterophily score。
-- **Incrementality Risk**：中偏高。补入 `HLCL` / `HGMS` 后，如果只是把 GCA 的中心性换成 heterophily score、graph filter 或 metapath connection strength，会被认为小改；如果能提出可校准 reliability objective，并证明能预测 view failure，风险才会下降。
+- **Novelty Risk**：高。`GREET` 已做 edge heterophily discriminating，`HLCL` 已用 low-pass / high-pass graph filters 构造 heterophily-aware contrastive views，`HGMS` 已在 heterogeneous graph 中用 connection-strength-guided heterogeneous edge dropping 增强同配性；新增 `PolyGCL`、`HeterGCL`、`M3P-GCL`、`ROSEN` 又分别覆盖 spectral polynomial filters、放弃随机增强的结构/语义学习、macro-micro message passing 和 local false-positive structure reconstruction。因此不能再把“异配图上语义保持增强”本身作为主要 novelty。剩余空间必须收窄为“带不确定性的 view reliability / positive reliability calibration / pair reliability”，而不是换一个 heterophily score。
+- **Incrementality Risk**：高。补入 `PolyGCL` / `HeterGCL` / `M3P-GCL` / `ROSEN` 后，如果只是把 GCA 的中心性换成 heterophily score、graph filter、metapath connection strength 或 self-loop/message-passing 分支，会被认为小改；如果能提出可校准 reliability objective，并证明能预测 view failure 和 positive-pair failure，风险才会下降。
 - **Top-conference Potential**：4
-- **是否已有高度相似工作**：有。`HLCL` 已经明确做 heterophily-aware augmentation / view construction，`HGMS` 已经在异构图中做 homophily-aware heterogeneous edge dropping，`GREET` 已经做 edge heterophily discriminating。该 gap 还成立的前提是把问题推进到“增强视图是否可靠、正样本是否可靠、边类型是否不确定”的校准框架。
-- **是否只是换 augmentation / 换 loss**：风险升高。如果只是把 `HLCL` 的 graph filters 换成另一种 filter，或把 `HGMS` 的 connection strength 换成另一种边分数，会被认为 incremental；只有显式建模 view / pair reliability 并提供 failure diagnostics，才不是简单换增强。
+- **是否已有高度相似工作**：有，而且比上一轮更拥挤。`HLCL` 已经明确做 heterophily-aware augmentation / view construction，`HGMS` 已经在异构图中做 homophily-aware heterogeneous edge dropping，`GREET` 已经做 edge heterophily discriminating，`PolyGCL` / `HeterGCL` / `M3P-GCL` / `ROSEN` 又从 spectral filter、结构语义学习、message passing、local positive reconstruction 多侧覆盖异配 GCL。该 gap 还成立的前提是把问题推进到“增强视图是否可靠、正样本是否可靠、边类型/结构推断是否不确定”的校准框架。
+- **是否只是换 augmentation / 换 loss**：风险很高。如果只是把 `HLCL` 的 graph filters 换成另一种 filter，或把 `HGMS` 的 connection strength 换成另一种边分数，或把 `M3P-GCL` 的 message passing 分支换一种组合，会被认为 incremental；只有显式建模 view / pair reliability 并提供 failure diagnostics，才不是简单换增强。
 - **是否能形成清楚的方法贡献**：能。核心贡献可以是 heterophily-aware view reliability estimator + reliability-weighted GCL。
 - **是否有可验证的 failure mode**：有。可验证随机 edge dropping / diffusion 在低同配率区域导致 positive view 语义不一致。
 - **是否有机会做理论或机制分析**：有。可以分析 homophily ratio、edge type uncertainty 与 InfoNCE 正样本噪声的关系。
 - **是否适合短期启动实验**：适合。可先在 GRACE/GCA 框架上插入 edge-type reliability 模块做 Cora/Citeseer/PubMed + Chameleon/Squirrel/Actor。
-- **强 baseline 攻击点**：HLCL、HGMS、GREET、GCA、BGRL、CCA-SSG、GraphMAE、LINKX。如果不能解释相对 HLCL 的 graph-filter views 和 HGMS 的 MCS-guided edge dropping 还有什么新增可靠性机制，选题会被认为已被覆盖。
+- **强 baseline 攻击点**：HLCL、HGMS、GREET、PolyGCL、HeterGCL、M3P-GCL、ROSEN、GCA、BGRL、CCA-SSG、GraphMAE、LINKX、H2GB。如果不能解释相对 HLCL/PolyGCL 的 filter views、HGMS 的 MCS-guided edge dropping、HeterGCL/M3P-GCL 的异配 message passing、ROSEN 的 local positive reconstruction 还有什么新增可靠性机制，选题会被认为已被覆盖。
 - **相关论文与未解决点**：
   - `GRACE`：做 edge dropping + feature masking，但默认随机扰动语义保持；未解决异配边被误删问题。
   - `GCA`：用中心性和特征重要性做 adaptive augmentation，但中心性不等于异配语义可靠性。
@@ -57,10 +57,15 @@
   - `GREET`：开始处理异配边判别，但仍可扩展到不确定增强、positive reliability 和大规模异配。
   - `HLCL`：已经做 graph-filter heterophily-aware views，并明确在 homophilic / heterophilic subgraphs 上分别使用 low-pass / high-pass contrast；但边类型来自特征相似度近似，未显式校准子图划分不确定性，也未处理 graph-text 或异构 metapath 冲突。
   - `HGMS`：已经做 connection-strength-guided heterogeneous edge dropping 和 multi-view self-expression，覆盖异构图同配增强；但它的场景主要是 metapath-based heterogeneous graph，未形成通用 view reliability 框架。
-- **定向补强后剩余未解决问题**：heterophily-aware augmentation 已有强相关工作；真正未解决的是增强后正样本是否仍可靠、边类型估计是否可校准、低可靠视图是否应被降权，以及该机制能否跨 homophily/heterophily/heterogeneous/TAG 场景泛化。
-- **为什么不是简单 incremental**：必须把核心问题定义为“GCL 正视图语义保持假设在异配图上存在可测量的可靠性噪声”，并用 reliability 统一 view generation、positive weighting 和 failure diagnosis；否则相对 `HLCL` / `HGMS` 很容易只是局部增强替换。
+  - `PolyGCL`：已经用 learnable spectral polynomial filters 引入 high-pass/low-pass 信息，并在 synthetic 与真实异配图上验证；但没有显式估计某个 filtered view 或正对是否可靠。
+  - `HeterGCL`：已经放弃随机增强，结合 ANA、结构学习和语义学习处理异配图；但正负样本可靠性仍是隐式目标。
+  - `M3P-GCL`：已经用 structural/attribute views 和 adaptive self-propagation 改造 macro/micro message passing；但未提供可解释 view failure calibration。
+  - `ROSEN`：已经指出 local positive sampling 会产生 false positive samples，并重构同配结构；但其目标偏向重构同配 positive structure，未统一处理真实异配语义和 negative reliability。
+  - `Heterophilic Handbook` / `Re-evaluating Heterophilic Graph Learning` / `H2GB`：说明异配评估本身更难，必须区分 malignant/benign/ambiguous heterophily，并考虑大规模异构异配。
+- **定向补强后剩余未解决问题**：ordinary heterophily-aware augmentation 已经拥挤；真正未解决的是增强后正样本是否仍可靠、边类型/结构推断是否可校准、低可靠视图是否应被降权，以及该机制能否跨 homophily/heterophily/heterogeneous/TAG 场景泛化。
+- **为什么不是简单 incremental**：必须把核心问题定义为“GCL 正视图语义保持假设在异配图上存在可测量的可靠性噪声”，并用 reliability 统一 view generation、positive weighting 和 failure diagnosis；否则相对 `HLCL` / `PolyGCL` / `HeterGCL` / `M3P-GCL` / `ROSEN` 很容易只是局部增强替换。
 - **最可能的核心创新点**：uncertainty-calibrated heterophily-aware semantic reliability estimator，让增强强度、正样本权重和编码器通道共同受可靠性控制，并能预测 view failure。
-- **Evidence**：`GRACE` Evidence: Method section on graph augmentation and contrastive objective；`GCA` Evidence: Method section on adaptive augmentation；`BGRL` Evidence: Method section on bootstrapping；`H2GCN` Evidence: Method/theory sections；`LINKX` Evidence: Benchmark/method sections；`GREET` Evidence: Method section on edge heterophily discriminating；`HLCL` Evidence: PMLR Abstract, arXiv Section 4.1, Section 5.1, Tables 1/5/6, Section 6 limitations；`HGMS` Evidence: arXiv Abstract, Sections 3.3/3.4/3.5, Section 4.1, Tables 2/3/5；`method_taxonomy.md` 5.2 Heterophilic Graph 与 6.1 Augmentation Semantic Preservation。
+- **Evidence**：`GRACE` Evidence: Method section on graph augmentation and contrastive objective；`GCA` Evidence: Method section on adaptive augmentation；`BGRL` Evidence: Method section on bootstrapping；`H2GCN` Evidence: Method/theory sections；`LINKX` Evidence: Benchmark/method sections；`GREET` Evidence: Method section on edge heterophily discriminating；`HLCL` Evidence: PMLR Abstract, arXiv Section 4.1, Section 5.1, Tables 1/5/6, Section 6 limitations；`HGMS` Evidence: arXiv Abstract, Sections 3.3/3.4/3.5, Section 4.1, Tables 2/3/5；`PolyGCL` Evidence: ICLR Abstract, Theorem 1, Tables 1/2/3；`HeterGCL` Evidence: IJCAI Abstract, Table 1, Tables 2/3, Section 5.4；`M3P-GCL` Evidence: AAAI Abstract, Tables 1/2/3/4；`ROSEN` Evidence: WWW Abstract, Theorem 3.2, Tables 1/2；`Heterophilic Handbook` / `Re-evaluating` / `H2GB` Evidence: Abstract and benchmark tables；`method_taxonomy.md` 5.2 Heterophilic Graph 与 6.1 Augmentation Semantic Preservation。
 
 ## Gap 2: Reliability-aware False Negative and False Positive Correction
 
@@ -77,7 +82,7 @@
   - Hard-negative triage：分为 true-hard、false-hard、uncertain-hard。
   - Reliability diagnostics：输出 pair reliability 与下游错误的相关性。
 - **Required Datasets**：Cora、Citeseer、PubMed、Amazon、Coauthor；Chameleon、Squirrel、Actor；TU datasets / MoleculeNet；推荐数据 Gowalla、Yelp、Amazon-Book；text-attributed graph 可作为扩展。
-- **Required Baselines**：DGI、MVGRL、InfoGraph、GRACE、GCA、GraphCL、AD-GCL、JOAO、BGRL、CCA-SSG、GDCL、ProGCL、CGC、HLCL、HGMS、GraphMAE、GraphMAE2。
+- **Required Baselines**：DGI、MVGRL、InfoGraph、GRACE、GCA、GraphCL、AD-GCL、JOAO、BGRL、CCA-SSG、GDCL、ProGCL、CGC、IFL-GCL、ROSEN、HLCL、HGMS、PolyGCL、HeterGCL、GraphMAE、GraphMAE2；graph-text 扩展时还应比较 GAugLLM / GCL-OT。
 - **Key Experiments**：
   - 主结果：node classification、graph classification、recommendation 或 molecule property 至少覆盖两个图类型。
   - 消融：只修正 negative、只修正 positive、去掉 hard-negative triage、只用相似度可靠性、只用聚类可靠性。
@@ -85,28 +90,30 @@
   - 鲁棒性：提高 batch size、增加同类节点密度、增强强度加大，观察 false negative / false positive 对性能影响。
   - 可扩展性：比较 reliability estimator 的额外时间和显存。
 - **Key Risk**：无标签场景下 pair reliability 难以准确估计，若估计器本身依赖当前表示，会出现 early-stage confirmation bias。
-- **Novelty Risk**：高于原判断。`GDCL`、`ProGCL`、`CGC` 已覆盖 false negative / hard negative；新增 `HGMS` 还在 heterogeneous graph 中用 multi-view self-expression 缓解 false negatives，`HLCL` 则从 heterophily-aware views 侧面减少 false positive views。因此 Gap 2 不能只声称“修正 false negative”。剩余 novelty 必须是 positive reliability 与 negative reliability 的双向校准、true-hard / false-hard / uncertain-hard 区分，以及跨 node/graph/heterogeneous/graph-text 场景的统一证据融合。
-- **Incrementality Risk**：中等偏高。如果只是给 InfoNCE 加一个相似度权重，会被认为 incremental；如果能证明 false positive view 和 false negative pair 同时存在，并统一处理，风险下降。
+- **Novelty Risk**：高于原判断。`GDCL`、`ProGCL`、`CGC` 已覆盖 false negative / hard negative；`IFL-GCL` 已把 GCL 解释为 Positive-Unlabeled learning，并用 InfoNCE-derived score 挖掘语义相似 non-augmented positives；`ROSEN` 已明确处理 heterophily local positive sampling 的 false positive samples；`HGMS` 用 multi-view self-expression 缓解 heterogeneous graph false negatives，`HLCL` / `PolyGCL` 则从 heterophily-aware views 侧面减少 false positive views。因此 Gap 2 不能只声称“修正 false negative”或“重新加权 InfoNCE”。剩余 novelty 必须是 positive reliability 与 negative reliability 的双向校准、true-hard / false-hard / uncertain-hard 区分，以及跨 node/graph/heterogeneous/graph-text 场景的统一证据融合。
+- **Incrementality Risk**：中偏高到高。如果只是给 InfoNCE 加一个相似度权重，会被 `IFL-GCL` / `ProGCL` 攻击；如果只处理 positive view，又会被 `ROSEN` / heterophily-aware GCL 攻击。只有证明 false positive view 和 false negative pair 同时存在，并用同一个 reliability variable 统一处理，风险才会下降。
 - **Top-conference Potential**：5
-- **是否已有高度相似工作**：有。`GDCL`、`ProGCL`、`CGC` 是 negative reliability / hard negative 方向强相关工作；`HGMS` 已经把 self-expression 用于 HeteroGCL 的 false negative mitigation；`HLCL` 已经通过 heterophily-aware view construction 间接减少 false positive views。但目前仍缺少同时估计 positive reliability 与 negative reliability 的统一框架。
+- **是否已有高度相似工作**：有。`GDCL`、`ProGCL`、`CGC` 是 negative reliability / hard negative 方向强相关工作；`IFL-GCL` 已经做 PU-style semantically guided positives；`ROSEN` 已经显式指出并修正 heterophilic local positive false positives；`HGMS` 已经把 self-expression 用于 HeteroGCL 的 false negative mitigation；`HLCL` / `PolyGCL` 已经通过 heterophily-aware view construction 间接减少 false positive views。但目前仍缺少同时估计 positive reliability 与 negative reliability 的统一框架。
 - **是否只是换 augmentation / 换 loss**：不是，若方法输出可解释 pair reliability 并改变 positive/negative 双侧训练；否则可能被看成 loss reweighting。
 - **是否能形成清楚的方法贡献**：能。核心是 pair reliability as a first-class variable。
 - **是否有可验证的 failure mode**：有。可以用真实标签后验统计 false negatives，用增强强度/结构破坏制造 false positive views。
 - **是否有机会做理论或机制分析**：有。可将 InfoNCE 视为带噪 positive/negative labels 的风险最小化，分析 reliability weighting 降低噪声偏差。
 - **是否适合短期启动实验**：适合。可先在 GRACE/GCA + ProGCL 风格 hard negative 上实现。
-- **强 baseline 攻击点**：ProGCL、GDCL、CGC、HGMS、HLCL、GCA、BGRL、CCA-SSG。如果不能说明相对 ProGCL/GDCL/CGC 的负样本处理、相对 HGMS 的 false negative mitigation、相对 HLCL 的 view reliability 还有新增机制，选题站不稳。
+- **强 baseline 攻击点**：IFL-GCL、ProGCL、GDCL、CGC、ROSEN、HGMS、HLCL、PolyGCL、GCA、BGRL、CCA-SSG、GCL-OT。如果不能说明相对 IFL-GCL/ProGCL/GDCL/CGC 的负样本处理、相对 ROSEN 的 false positive local positives、相对 HGMS 的 false negative mitigation、相对 HLCL/PolyGCL 的 view reliability 还有新增机制，选题站不稳。
 - **相关论文与未解决点**：
   - `GRACE` / `GraphCL` / `InfoGraph`：使用 batch 或跨图 negatives，但未识别同类 false negatives。
   - `GCA`：改善增强，但仍把其他节点当负样本。
   - `GDCL`：用聚类估计 false negatives，但聚类可靠性和早期训练不稳定未完全解决。
   - `ProGCL`：渐进式 true-negative probability，但主要针对 hard negatives。
   - `CGC`：生成 counterfactual hard negatives，但生成负样本语义是否真正相异难验证。
+  - `IFL-GCL`：已经把 GCL 转写为 PU learning，并用 InfoNCE free-lunch 挖掘语义相似未标注正样本；但它主要解决 negative side 的 sampling bias，未同等处理增强导致的 positive reliability。
+  - `ROSEN`：已经指出异配图 local positive sampling 会产生 false positive samples，并通过结构推断重构更同配的 positive structure；但没有统一处理 in-batch false negatives 和 graph-text/recommendation 场景。
   - `HLCL`：通过 heterophily-aware filtered views 降低异配图中 false positive view 的风险，但并没有显式给每个 positive / negative pair 校准可靠性。
   - `HGMS`：通过 multi-view self-expression 缓解 heterogeneous graph 中的 false negatives，但主要针对 metapath/HeteroGCL 场景，未覆盖 false positive view 与跨域 pair reliability。
-- **定向补强后剩余未解决问题**：positive/negative reliability 已有局部处理，但还没有一个同时回答“正对是否仍语义一致、负对是否确实相异、hard negative 是否真实、跨模态证据冲突时如何降权”的统一模型。
+- **定向补强后剩余未解决问题**：positive/negative reliability 已有局部处理：`IFL-GCL` 更接近 negative-side / PU correction，`ROSEN` 更接近 heterophily positive-side correction，`HGMS` 更接近异构 false negative mitigation。但还没有一个同时回答“正对是否仍语义一致、负对是否确实相异、hard negative 是否真实、跨模态证据冲突时如何降权”的统一模型。
 - **为什么不是简单 incremental**：因为它同时挑战两个基础假设：正样本不一定真正、负样本不一定相异；要做成方法型论文，必须证明这是 GCL 训练标签噪声的统一校准问题，而不是给 InfoNCE 再加一层相似度权重。
 - **最可能的核心创新点**：双向 pair reliability calibration，把 positive alignment 和 negative repulsion 都变成可置信训练信号，并输出可验证的 true-hard / false-hard / uncertain-hard 诊断。
-- **Evidence**：`GRACE` Evidence: contrastive objective；`GraphCL` Evidence: graph augmentations and InfoNCE；`GDCL` Evidence: joint clustering/debiasing；`ProGCL` Evidence: Method/theory on ProGCL；`CGC` Evidence: counterfactual hard negatives；`HLCL` Evidence: arXiv Section 4.1/4.2 and Tables 1/5/6；`HGMS` Evidence: arXiv Sections 3.4/3.5 and Tables 2/3/5；`method_taxonomy.md` 4.4 False Negative Correction 与 6.2 False Negative / Class Collision。
+- **Evidence**：`GRACE` Evidence: contrastive objective；`GraphCL` Evidence: graph augmentations and InfoNCE；`GDCL` Evidence: joint clustering/debiasing；`ProGCL` Evidence: Method/theory on ProGCL；`CGC` Evidence: counterfactual hard negatives；`IFL-GCL` Evidence: SIGIR Abstract, Section 4.1, Tables 1/2, Eq. 18/19/20, official GitHub；`ROSEN` Evidence: WWW Abstract, Section 3.2/Theorem 3.2, Tables 1/2；`HLCL` Evidence: arXiv Section 4.1/4.2 and Tables 1/5/6；`HGMS` Evidence: arXiv Sections 3.4/3.5 and Tables 2/3/5；`GCL-OT` Evidence: AAAI/arXiv Abstract, Theorem 1, Tables 1/2；`method_taxonomy.md` 4.4 False Negative Correction 与 6.2 False Negative / Class Collision。
 
 ## Gap 3: Negative-free GCL under Heterophily and Sparse Graphs
 
@@ -295,35 +302,37 @@
   - Structure-preserving text augmentation。
   - Optional LLM explanation module：生成冲突原因但不直接参与评分。
 - **Required Datasets**：MoleculeSTM 使用的 molecule-text corpus；text-attributed citation/product graphs；OGB-Arxiv with titles/abstracts；若可行加入 PubMed / arXiv text-attributed node classification。
-- **Required Baselines**：GAugLLM、MoleculeSTM、GraphCLIP、GraphGPT；GraphMAE / GraphMAE2 作为 structure-only pretraining；GRACE/GCA/BGRL/CCA-SSG 作为 graph-only SSL；CLIP-style graph-text baseline。
+- **Required Baselines**：GAugLLM、GCL-OT、MoleculeSTM、GraphCLIP、GraphGPT、IFL-GCL；GraphMAE / GraphMAE2 作为 structure-only pretraining；GRACE/GCA/BGRL/CCA-SSG 作为 graph-only SSL；CLIP-style graph-text baseline。
 - **Key Experiments**：
   - 主结果：graph-text retrieval、zero-shot / few-shot node classification、transfer learning。
   - 消融：去掉 conflict classifier、硬 InfoNCE、只用文本相似软标签、只用结构相似软标签。
   - 机制分析：人工或启发式构造 conflict pairs，测模型是否降低错误 alignment。
   - 鲁棒性：文本噪声、标题替换、摘要截断、结构扰动。
   - 可扩展性：预训练成本和检索索引规模。
-- **Key Risk**：graph-text 方向数据和模型工程量较大；如果没有高质量 conflict benchmark，很难证明 gap。
-- **Novelty Risk**：中等偏高。`GAugLLM` 已经用 LLM 同时做 TAG feature augmentation 和 edge augmentation，`GraphCLIP` / `MoleculeSTM` 已覆盖 graph-text contrastive alignment，`GraphGPT` 覆盖图到 LLM 指令调优；因此不能把“LLM 改进 graph-text/TAG augmentation”当作主要 novelty。剩余空间必须是 structure-text conflict taxonomy、conflict-aware soft labels、cross-modal positive/negative reliability，以及能证明 GAugLLM 这类 LLM augmentation 仍会失败的机制实验。
-- **Incrementality Risk**：中等偏高。如果只是把 CLIP loss 换成加权 loss，或在 GAugLLM 上再换一个 LLM prompt，会被质疑；如果有明确 conflict taxonomy、可复现实验集和软标签/可靠性目标，风险较低。
-- **Top-conference Potential**：5
-- **是否已有高度相似工作**：有部分高度相似。`GAugLLM` 已经是 text-attributed graph 上的 LLM-based GCL augmentation，`GraphCLIP` 已经做 TAG 的 language-graph pretraining；但它们没有系统定义结构-文本冲突类型，也没有显式给 graph-text pairs 做 reliability calibration。
-- **是否只是换 augmentation / 换 loss**：有风险。若只是把 GAugLLM 的 LLM feature/edge augmentation 换成新 prompt 或换损失，很容易 incremental；核心必须是 conflict modeling、soft pair semantics 和可验证的 conflict failure mode。
+- **Key Risk**：graph-text 方向数据和模型工程量较大；`GAugLLM` 已覆盖 LLM-based TAG feature/edge augmentation，`GCL-OT` 已覆盖 heterophilic TAG 的 OT-based structure-text alignment。如果没有高质量 conflict benchmark，很难证明 gap。
+- **Novelty Risk**：高。`GAugLLM` 已经用 LLM 同时做 TAG feature augmentation 和 edge augmentation，`GraphCLIP` / `MoleculeSTM` 已覆盖 graph-text contrastive alignment，`GraphGPT` 覆盖图到 LLM 指令调优；新增 `GCL-OT` 直接处理 heterophilic text-attributed graphs，用 optimal transport 做 flexible bidirectional structure-text alignment，并给出 multi-granular heterophily 机制。因此不能把“LLM 改进 graph-text/TAG augmentation”或“异配 TAG structure-text alignment”当作主要 novelty。剩余空间必须是 structure-text conflict taxonomy、conflict-aware soft labels、cross-modal positive/negative reliability，以及能证明 GAugLLM / GCL-OT 仍会在冲突样本上失败的机制实验。
+- **Incrementality Risk**：高。如果只是把 CLIP loss 换成加权 loss、在 GAugLLM 上再换一个 LLM prompt，或在 GCL-OT 上换一个 alignment loss，会被质疑；如果有明确 conflict taxonomy、可复现实验集、软标签/可靠性目标和冲突样本 failure verification，风险才会下降。
+- **Top-conference Potential**：4
+- **是否已有高度相似工作**：有部分高度相似且风险上升。`GAugLLM` 已经是 text-attributed graph 上的 LLM-based GCL augmentation，`GraphCLIP` 已经做 TAG 的 language-graph pretraining，`GCL-OT` 已经做 heterophilic TAG 的 OT-based structure-text alignment；但它们没有系统定义结构-文本冲突类型，也没有显式给 graph-text pairs 做 conflict-aware reliability calibration。
+- **是否只是换 augmentation / 换 loss**：有高风险。若只是把 GAugLLM 的 LLM feature/edge augmentation 换成新 prompt，或把 GCL-OT 的 OT alignment 换成另一个软对齐损失，很容易 incremental；核心必须是 conflict modeling、soft pair semantics 和可验证的 conflict failure mode。
 - **是否能形成清楚的方法贡献**：能。graph-text pair reliability / conflict-aware contrastive learning。
 - **是否有可验证的 failure mode**：有。可构造文本相似但结构不同、结构相似但文本不同的 conflict sets。
 - **是否有机会做理论或机制分析**：有。可分析多模态对比中的 false negative / false positive pair noise。
 - **是否适合短期启动实验**：中等。若先用 OGB-Arxiv title/abstract + graph structure 可较快启动；分子图文需要更多工程。
-- **强 baseline 攻击点**：GAugLLM、GraphCLIP、MoleculeSTM、GraphGPT、GraphMAE2、BGRL、CCA-SSG。若不能解释相对 GAugLLM 的 LLM augmentation 仍有什么未解决的 structure-text conflict，或只在一个 graph-text 数据集有效，泛化会被质疑。
+- **强 baseline 攻击点**：GAugLLM、GCL-OT、GraphCLIP、MoleculeSTM、GraphGPT、IFL-GCL、GraphMAE2、BGRL、CCA-SSG。若不能解释相对 GAugLLM 的 LLM augmentation、相对 GCL-OT 的 heterophilic TAG optimal transport alignment 仍有什么未解决的 structure-text conflict，或只在一个 graph-text 数据集有效，泛化会被质疑。
 - **相关论文与未解决点**：
   - `MoleculeSTM`：对齐 molecule-text pair，但主要在分子检索/编辑；冲突样本未系统处理。
   - `GraphCLIP`：CLIP-style text-attributed graph pretraining，但容易继承 CLIP 的 in-batch false negative 问题。
   - `GraphGPT`：图指令调优，更多关注 LLM 图理解，不是 pair reliability。
   - `GAugLLM`：已经用 LLM 做 TAG feature augmentation 和 edge modifier，处理了“文本语义可帮助增强”的问题；但没有把结构-文本冲突分成可诊断类型，也未显式处理 graph-text positive / negative reliability。
+  - `GCL-OT`：已经处理 heterophilic TAG 的 structure-text alignment，提出 RealSoftMax、filter-prompt 和 OT-guided latent homophily supervision；但它主要按 multi-granular heterophily 对齐结构与文本，未构造文本相似但结构冲突、结构相似但文本冲突、LLM 生成语义与结构证据冲突的可复现 conflict benchmark。
+  - `Large Language Models Meet Text-Attributed Graphs` / `Graph Foundation Models: A Comprehensive Survey`：说明 LLM+TAG / GFM 方向已经快速拥挤，普通 LLM augmentation 和泛泛预训练叙事不足以支撑 novelty。
   - `GraphMAE2`：结构 masked pretraining，可作为结构-only 对照，但无文本冲突机制。
   - `GRACE` / `GCA`：graph-only GCL，不能处理文本语义。
-- **定向补强后剩余未解决问题**：graph-text / TAG augmentation 已有 GAugLLM 这样的强相关工作；真正未解决的是文本相似但结构冲突、结构相似但文本冲突、LLM 生成文本与真实结构证据冲突时，正负样本语义如何重新定义和校准。
-- **为什么不是简单 incremental**：它不是给 graph-text loss 加权，也不是再做 LLM augmentation，而是定义结构-文本冲突类型并改变正负样本语义；需要证明现有 GAugLLM/GraphCLIP 在冲突样本上会产生可测失败。
+- **定向补强后剩余未解决问题**：graph-text / TAG augmentation 已有 GAugLLM，heterophilic TAG alignment 已有 GCL-OT；真正未解决的是文本相似但结构冲突、结构相似但文本冲突、LLM 生成文本与真实结构证据冲突时，正负样本语义如何重新定义和校准。
+- **为什么不是简单 incremental**：它不是给 graph-text loss 加权，也不是再做 LLM augmentation 或普通 OT alignment，而是定义结构-文本冲突类型并改变正负样本语义；需要证明现有 GAugLLM/GraphCLIP/GCL-OT 在冲突样本上会产生可测失败。
 - **最可能的核心创新点**：cross-modal pair reliability and conflict-aware contrastive objective，配合可复现的 structure-text conflict benchmark / diagnostics。
-- **Evidence**：`GAugLLM` Evidence: arXiv Abstract, Sections 4.1/4.2, Section 5.1, Tables 2/3/4, KDD DOI, official GitHub；`MoleculeSTM` Evidence: molecule-text contrastive learning；`GraphCLIP` Evidence: Method section on GraphCLIP；`GraphGPT` Evidence: graph instruction tuning；`GraphMAE2` Evidence: large-scale masked graph SSL；`method_taxonomy.md` 2.6 Graph-Text 与 6.7 Graph Foundation Model Pretraining。
+- **Evidence**：`GAugLLM` Evidence: arXiv Abstract, Sections 4.1/4.2, Section 5.1, Tables 2/3/4, KDD DOI, official GitHub；`GCL-OT` Evidence: AAAI/arXiv Abstract, Experimental Settings, Tables 1/2/3, Time Complexity Analysis, Theorem 1, official GitHub；`MoleculeSTM` Evidence: molecule-text contrastive learning；`GraphCLIP` Evidence: Method section on GraphCLIP；`GraphGPT` Evidence: graph instruction tuning；`Large Language Models Meet Text-Attributed Graphs` Evidence: Abstract and LLM4TAG/TAG4LLM taxonomy；`Graph Foundation Models: A Comprehensive Survey` Evidence: Abstract and GFM taxonomy；`GraphMAE2` Evidence: large-scale masked graph SSL；`method_taxonomy.md` 2.6 Graph-Text 与 6.7 Graph Foundation Model Pretraining。
 
 ## Gap 8: Molecular Semantic-valid Augmentation beyond 2D Random Perturbation
 
@@ -456,14 +465,14 @@
 
 ## 总结性排序
 
-排序原则已同步为“短期可执行 + novelty 风险可控”优先；`HLCL` / `HGMS` / `GAugLLM` 补入后，Gap 1 和 Gap 7 的增量风险均上调。
+排序原则已同步为“短期可执行 + novelty 风险可控”优先；`PolyGCL` / `HeterGCL` / `M3P-GCL` / `ROSEN` / `IFL-GCL` / `GCL-OT` 补入后，Gap 1、Gap 2、Gap 7 的增量风险均上调。普通异配增强和普通 LLM/TAG augmentation 不再建议作为主 claim。
 
 | Rank | Gap | Top-conference Potential | Incrementality Risk | Short-term Start | 更适合 Venue |
 |---:|---|---:|---|---|---|
-| 1 | Reliability-aware False Negative and False Positive Correction | 5 | 中偏高 | 适合 | ICML / NeurIPS / ICLR；KDD / WWW |
-| 2 | Heterophily-aware Semantic-Preserving Augmentation | 4 | 中偏高；HLCL/HGMS 后风险升高 | 适合 | NeurIPS / ICLR / ICML；KDD / WWW |
-| 3 | Mini-batch Friendly Scalable GCL with Controlled Negative Noise | 4 | 中 | 中等 | KDD / WWW / NeurIPS / TKDE |
-| 4 | Graph-Text Conflict-aware Contrastive Pretraining | 5 | 中等偏高；GAugLLM 后风险升高 | 中等 | NeurIPS / ICLR / ICML；KDD / WWW |
+| 1 | Reliability-aware False Negative and False Positive Correction | 5 | 中偏高到高；IFL-GCL/ROSEN 后必须做双侧 reliability | 适合 | ICML / NeurIPS / ICLR；KDD / WWW |
+| 2 | Mini-batch Friendly Scalable GCL with Controlled Negative Noise | 4 | 中 | 中等 | KDD / WWW / NeurIPS / TKDE |
+| 3 | Heterophily-aware Semantic-Preserving Augmentation | 4 | 高；HLCL/HGMS/PolyGCL/HeterGCL/M3P-GCL/ROSEN 后普通异配增强很拥挤 | 适合 | NeurIPS / ICLR / ICML；KDD / WWW |
+| 4 | Graph-Text Conflict-aware Contrastive Pretraining | 4 | 高；GAugLLM/GCL-OT 后普通 LLM augmentation 或 structure-text alignment 风险高 | 中等 | NeurIPS / ICLR / ICML；KDD / WWW |
 | 5 | Negative-free GCL under Heterophily and Sparse Graphs | 4 | 中偏高 | 中等 | ICLR / ICML / AAAI |
 | 6 | Non-stationary Temporal View Reliability for Dynamic GCL | 4 | 中 | 中等 | KDD / WWW / ICDE / TKDE |
 | 7 | Contrastive-Generative Reliability Learning | 4 | 高 | 适合 prototype | ICLR / NeurIPS；KDD / WWW |
