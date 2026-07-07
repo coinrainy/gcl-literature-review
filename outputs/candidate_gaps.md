@@ -40,7 +40,7 @@
   - 机制分析：按边类型统计被保留/删除概率；按 homophily ratio 分组看提升来源；可视化 low-reliability view 是否对应性能下降。
 - **Key Risk**：边类型估计可能需要标签或伪标签，如果无监督估计不准，会导致方法复杂但收益不稳定。
 - **Novelty Risk**：高于原判断。`GREET` 已做 edge heterophily discriminating，`HLCL` 已用 low-pass / high-pass graph filters 构造 heterophily-aware contrastive views，`HGMS` 已在 heterogeneous graph 中用 connection-strength-guided heterogeneous edge dropping 增强同配性；因此不能再把“异配图上语义保持增强”本身作为主要 novelty。剩余空间必须收窄为“带不确定性的 view reliability / positive reliability calibration / 跨同构-异构-图文场景的统一增强可靠性”，而不是换一个 heterophily score。
-- **Incrementality Risk**：中等。如果只是把 GCA 的中心性换成 heterophily score，会被认为小改；如果能提出可校准 reliability objective，并证明能预测 view failure，就不是简单 incremental。
+- **Incrementality Risk**：中偏高。补入 `HLCL` / `HGMS` 后，如果只是把 GCA 的中心性换成 heterophily score、graph filter 或 metapath connection strength，会被认为小改；如果能提出可校准 reliability objective，并证明能预测 view failure，风险才会下降。
 - **Top-conference Potential**：4
 - **是否已有高度相似工作**：有。`HLCL` 已经明确做 heterophily-aware augmentation / view construction，`HGMS` 已经在异构图中做 homophily-aware heterogeneous edge dropping，`GREET` 已经做 edge heterophily discriminating。该 gap 还成立的前提是把问题推进到“增强视图是否可靠、正样本是否可靠、边类型是否不确定”的校准框架。
 - **是否只是换 augmentation / 换 loss**：风险升高。如果只是把 `HLCL` 的 graph filters 换成另一种 filter，或把 `HGMS` 的 connection strength 换成另一种边分数，会被认为 incremental；只有显式建模 view / pair reliability 并提供 failure diagnostics，才不是简单换增强。
@@ -456,15 +456,17 @@
 
 ## 总结性排序
 
+排序原则已同步为“短期可执行 + novelty 风险可控”优先；`HLCL` / `HGMS` / `GAugLLM` 补入后，Gap 1 和 Gap 7 的增量风险均上调。
+
 | Rank | Gap | Top-conference Potential | Incrementality Risk | Short-term Start | 更适合 Venue |
 |---:|---|---:|---|---|---|
-| 1 | Heterophily-aware Semantic-Preserving Augmentation | 5 | 中 | 适合 | NeurIPS / ICLR / ICML；KDD / WWW |
-| 2 | Reliability-aware False Negative and False Positive Correction | 5 | 中偏高 | 适合 | ICML / NeurIPS / ICLR；KDD / WWW |
-| 3 | Graph-Text Conflict-aware Contrastive Pretraining | 5 | 中 | 中等 | NeurIPS / ICLR / ICML；KDD / WWW |
-| 4 | Contrastive-Generative Reliability Learning | 4 | 高 | 适合 prototype | ICLR / NeurIPS；KDD / WWW |
+| 1 | Reliability-aware False Negative and False Positive Correction | 5 | 中偏高 | 适合 | ICML / NeurIPS / ICLR；KDD / WWW |
+| 2 | Heterophily-aware Semantic-Preserving Augmentation | 4 | 中偏高；HLCL/HGMS 后风险升高 | 适合 | NeurIPS / ICLR / ICML；KDD / WWW |
+| 3 | Mini-batch Friendly Scalable GCL with Controlled Negative Noise | 4 | 中 | 中等 | KDD / WWW / NeurIPS / TKDE |
+| 4 | Graph-Text Conflict-aware Contrastive Pretraining | 5 | 中等偏高；GAugLLM 后风险升高 | 中等 | NeurIPS / ICLR / ICML；KDD / WWW |
 | 5 | Negative-free GCL under Heterophily and Sparse Graphs | 4 | 中偏高 | 中等 | ICLR / ICML / AAAI |
-| 6 | Mini-batch Friendly Scalable GCL with Controlled Negative Noise | 4 | 中 | 中等 | KDD / WWW / NeurIPS / TKDE |
-| 7 | Non-stationary Temporal View Reliability for Dynamic GCL | 4 | 中 | 中等 | KDD / WWW / ICDE / TKDE |
+| 6 | Non-stationary Temporal View Reliability for Dynamic GCL | 4 | 中 | 中等 | KDD / WWW / ICDE / TKDE |
+| 7 | Contrastive-Generative Reliability Learning | 4 | 高 | 适合 prototype | ICLR / NeurIPS；KDD / WWW |
 | 8 | Molecular Semantic-valid Augmentation beyond 2D Random Perturbation | 4 | 中 | 中等 | ICLR / NeurIPS；KDD / WWW |
 | 9 | Recommendation GCL Beyond Noise Regularization | 3 | 高 | 适合 | KDD / WWW / SIGIR / TKDE |
 | 10 | Cross-domain View Reliability as a General GCL Principle | 3 | 中偏高 | 不建议直接全做 | NeurIPS / ICLR if narrowed；TKDE survey-style extension |
