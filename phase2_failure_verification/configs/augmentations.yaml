@@ -1,0 +1,28 @@
+# Phase 2 only scans augmentation failure; it does not learn a new augmentation policy.
+
+edge_drop:
+  family: "GRACE / GCA style"
+  rates: [0.1, 0.2, 0.4, 0.6, 0.8]
+  random_seed: 42
+  metrics:
+    - edge_preservation_by_label_relation
+    - local_neighborhood_semantic_drift
+
+feature_mask:
+  family: "GRACE / GCA style"
+  rates: [0.1, 0.2, 0.4, 0.6, 0.8]
+  modes:
+    - feature
+    - element
+  random_seed: 42
+  metrics:
+    - positive_pair_cosine_similarity
+    - positive_pair_rank
+    - low_reliability_positive_ratio
+
+both:
+  family: "combined stress test"
+  rates: [0.1, 0.2, 0.4, 0.6]
+  random_seed: 42
+  note: "只用于 failure stress test，不作为新方法主张。"
+

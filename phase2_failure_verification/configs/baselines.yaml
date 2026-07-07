@@ -1,0 +1,38 @@
+reference_baselines:
+  vanilla_gcl:
+    - GRACE
+    - GCA
+    - GraphCL
+    - DGI
+    - MVGRL
+  negative_side:
+    - ProGCL
+    - GDCL
+    - IFL-GCL
+    - CGC
+  heterophily_positive_or_view_side:
+    - ROSEN
+    - HLCL
+    - PolyGCL
+    - HeterGCL
+    - M3P-GCL
+    - GREET
+  heterogeneous_graph:
+    - HGMS
+  negative_free_or_redundancy_reduction:
+    - BGRL
+    - CCA-SSG
+    - AFGRL
+  non_contrastive:
+    - GraphMAE
+    - GraphMAE2
+  graph_text_tag_optional:
+    - GAugLLM
+    - GCL-OT
+    - GraphGPT
+    - GraphCLIP
+
+phase2_scope:
+  do_not_reproduce_all_baselines: true
+  purpose: "先用 diagnostics 判断 failure mode 是否真实存在，再决定要复现哪些强 baseline。"
+

@@ -1,0 +1,99 @@
+# Phase 2 dataset registry.
+# Labels are only for post-hoc diagnostic analysis.
+
+groups:
+  homophily_sanity_check:
+    priority: first_round
+    purpose: "同配图 sanity check，用来确认诊断指标不会在普通同配场景中过度报警。"
+    datasets:
+      - name: Cora
+        loader: pyg.Planetoid
+        first_round: true
+      - name: Citeseer
+        loader: pyg.Planetoid
+        first_round: true
+      - name: PubMed
+        loader: pyg.Planetoid
+        first_round: true
+      - name: Amazon Computers
+        loader: pyg.Amazon
+        first_round: true
+      - name: Coauthor CS
+        loader: pyg.Coauthor
+        first_round: true
+
+  classic_heterophily:
+    priority: first_round
+    purpose: "经典异配图，用来验证 positive view failure 与 negative pair collision 是否在低同配场景更严重。"
+    datasets:
+      - name: Chameleon
+        loader: pyg.WikipediaNetwork
+        first_round: true
+      - name: Squirrel
+        loader: pyg.WikipediaNetwork
+        first_round: true
+      - name: Actor
+        loader: pyg.Actor
+        first_round: true
+      - name: Cornell
+        loader: pyg.WebKB
+        first_round: true
+      - name: Texas
+        loader: pyg.WebKB
+        first_round: true
+      - name: Wisconsin
+        loader: pyg.WebKB
+        first_round: true
+
+  large_or_strict_heterophily:
+    priority: reserved
+    purpose: "后续扩展，不要求第一轮跑完。"
+    datasets:
+      - name: Penn94
+        loader: custom_or_external
+        first_round: false
+      - name: genius
+        loader: custom_or_external
+        first_round: false
+      - name: twitch-gamers
+        loader: custom_or_external
+        first_round: false
+      - name: arXiv-year
+        loader: custom_or_external
+        first_round: false
+      - name: snap-patents
+        loader: custom_or_external
+        first_round: false
+      - name: pokec
+        loader: custom_or_external
+        first_round: false
+
+  graph_text_tag_extension:
+    priority: gap7_optional
+    purpose: "只作为 Gap 7 备选，不优先投入。"
+    datasets:
+      - name: ogbn-arxiv with title / abstract
+        loader: custom_or_ogb
+        first_round: false
+      - name: PubMed text-attributed graph
+        loader: custom_or_external
+        first_round: false
+      - name: WikiCS
+        loader: pyg.WikiCS
+        first_round: false
+      - name: Reddit TAG if available
+        loader: custom_or_external
+        first_round: false
+
+custom_input_format:
+  npz:
+    required_keys:
+      - "edge_index or edges: shape [2, E] or [E, 2]"
+    optional_keys:
+      - "x or features: shape [N, F]"
+      - "y or labels: shape [N]"
+  csv_numpy:
+    edge_index_path: "CSV/NPY, shape [2, E] or [E, 2]"
+    features_path: "optional CSV/NPY, shape [N, F]"
+    labels_path: "optional CSV/NPY, shape [N], used only post-hoc"
+

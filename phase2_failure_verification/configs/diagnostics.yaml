@@ -1,0 +1,51 @@
+principle:
+  labels_posthoc_only: true
+  forbidden_uses:
+    - "无监督训练目标优化"
+    - "增强策略选择"
+    - "训练时 pair weighting"
+  allowed_uses:
+    - "实验后统计 false positive view"
+    - "实验后统计 false negative pair"
+    - "分组解释 failure mode"
+
+graph_statistics:
+  output: "phase2_failure_verification/outputs/tables/graph_statistics.csv"
+  metrics:
+    - num_nodes
+    - num_edges
+    - num_features
+    - num_classes
+    - global_edge_homophily
+    - local_node_homophily_mean
+    - local_node_homophily_std
+    - degree_mean
+    - degree_std
+    - class_distribution
+    - same_class_edge_ratio
+    - cross_class_edge_ratio
+
+positive_view_failure:
+  output: "phase2_failure_verification/outputs/tables/positive_view_failure.csv"
+  homophily_groups:
+    low_homophily: "local_homophily < 0.33"
+    medium_homophily: "0.33 <= local_homophily < 0.66"
+    high_homophily: "local_homophily >= 0.66"
+  low_reliability_positive:
+    default_rule: "same-node cross-view similarity < same-class node average similarity"
+    threshold_override: "--positive-threshold"
+
+negative_pair_noise:
+  output: "phase2_failure_verification/outputs/tables/negative_pair_noise.csv"
+  batch_sizes: [128, 256, 512, 1024, full]
+  top_k: [5, 10, 20, 50]
+  proxy_when_no_embedding:
+    - raw_features
+    - PCA_features_TODO
+    - simple_GCN_embeddings_TODO
+
+joint_reliability_risk:
+  output: "phase2_failure_verification/outputs/tables/joint_reliability_risk.csv"
+  first_version_formula: "normalized_positive_failure_score + normalized_negative_collision_score"
+  interpretation: "用于 failure verification 排序，不是最终方法得分。"
+
