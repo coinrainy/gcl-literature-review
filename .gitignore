@@ -1,0 +1,12 @@
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Excel temporary files
+~$*.xlsx
+*.inspect.ndjson
+
+# Keep PDF storage local by default; uploaded papers may be copyrighted.
+papers/pdf/*.pdf
+!papers/pdf/.gitkeep
